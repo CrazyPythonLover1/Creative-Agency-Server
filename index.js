@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
+const fileUpload = require('express-fileupload');
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
@@ -13,6 +14,8 @@ const port = 5000
 
 app.use(cors())
 app.use(bodyParser.json())
+app.use(express.static('doctors'));
+app.use(fileUpload());
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -22,13 +25,13 @@ app.get('/', (req, res) => {
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
-  const serviceCollection = client.db(process.env.DB_NAME).collection("services");
+  const serviceCollection = client.db("Creative-Agency").collection("services");
   
 
   app.post('/addService', (req, res) => {
     const file = req.files.file;
     const title = req.body.title;
-    const des = req.body.des;
+    const description = req.body.description;
     const filePath = `${__dirname}/services/${file.name}`;
 
     file.mv(filePath, err => {
@@ -45,7 +48,7 @@ client.connect(err => {
         img: Buffer(encImg, 'base64')
       }
 
-      serviceCollection.insertOne({title, des, image})
+      serviceCollection.insertOne({title, description, image})
       .then(result => {
         fs.remove(filePath, error => {
           if(error){
@@ -59,7 +62,7 @@ client.connect(err => {
       return res.send({name: file.name, path: `/${file.name}`})
 
     })
-    
+
   })
 
 
