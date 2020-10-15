@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const serviceCollection = client.db("Creative-Agency").collection("services");
+  const placeOrderCollection = client.db("Creative-Agency").collection("placeOrder");
   
 
   app.post('/addService', (req, res) => {
@@ -71,6 +72,49 @@ client.connect(err => {
       res.status(200).send(docs);
     })
   })
+
+
+
+  app.post('/placeOrder', (req, res) => {
+    const file = req.files.file;
+    const name = req.body.name;
+    const email = req.body.email;
+    const selectedServiceName = req.body.selectedServiceName;
+    const description = req.body.description;
+    const price = req.body.price;
+    const filePath = `${__dirname}/placeOrder/${file.name}`;
+
+    file.mv(filePath, err => {
+      if(err){
+        res.status(500).send({message: "Failed to upload image"});
+      }
+
+      const newImg = fs.readFileSync(filePath);
+      const encImg = newImg.toString('base64');
+
+      var image = {
+        contentType: req.files.file.mimeType,
+        size: req.files.file.size,
+        img: Buffer(encImg, 'base64')
+      }
+
+      placeOrderCollection.insertOne({name, email, selectedServiceName, description, price, image})
+      .then(result => {
+        fs.remove(filePath, error => {
+          if(error){
+            console.log(error);
+            res.status(500).send({message: "Failed to upload Image "});
+          }
+          res.send(result.insertedCount > 0)
+        })
+      })
+
+      return res.send({name: file.name, path: `/${file.name}`})
+
+    })
+
+  })
+
 
 
 
