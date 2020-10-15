@@ -65,6 +65,13 @@ client.connect(err => {
 
   })
 
+  app.get('/getServices', (req,res) => {
+    serviceCollection.find({})
+    .toArray((err, docs)=>{
+      res.status(200).send(docs);
+    })
+  })
+
 
 
 });
