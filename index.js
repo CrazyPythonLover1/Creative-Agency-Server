@@ -10,7 +10,6 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 
 
 const app = express()
-const port = 5000
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -82,6 +81,7 @@ client.connect(err => {
     const selectedServiceName = req.body.selectedServiceName;
     const description = req.body.description;
     const price = req.body.price;
+    const serviceId = req.body.serviceId;
     const filePath = `${__dirname}/placeOrder/${file.name}`;
 
     file.mv(filePath, err => {
@@ -98,7 +98,7 @@ client.connect(err => {
         img: Buffer(encImg, 'base64')
       }
 
-      placeOrderCollection.insertOne({name, email, selectedServiceName, description, price, image})
+      placeOrderCollection.insertOne({name, email, selectedServiceName, description, price, image, serviceId})
       .then(result => {
         fs.remove(filePath, error => {
           if(error){
@@ -116,11 +116,33 @@ client.connect(err => {
   })
 
 
+  app.post('/getUserOrderList', (req,res) => {
+    const email = req.body.email;
+    console.log(email)
+    placeOrderCollection.find({email: email})
+    .toArray((err, docs)=>{
+      res.status(200).send(docs);
+    })
+  })
+
+//   app.post('/getOrderedServiceList', (req,res) => {
+//     const selectedServiceName = req.body.selectedServiceName;
+
+//     serviceCollection.find({title: selectedServiceName})
+//       .toArray((err, docs)=>{
+//       res.status(200).send(docs);
+    
+//   })
+
+// });
+
+
 
 
 });
 
-
+// const PORT = process.env.PORT || 5000
+const port = 5000
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
