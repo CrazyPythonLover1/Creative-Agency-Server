@@ -146,6 +146,13 @@ app.post('/addReview', (req, res)=> {
 
 })
 
+app.get('/getRviews', (req,res)=> {
+  reviewCollection.find({}).limit(6)
+  .toArray((err,documents)=> {
+    res.send(documents);
+  })
+})
+
 
 
 
