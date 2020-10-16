@@ -28,6 +28,7 @@ client.connect(err => {
   const serviceCollection = client.db("Creative-Agency").collection("services");
   const placeOrderCollection = client.db("Creative-Agency").collection("placeOrder");
   const reviewCollection = client.db("Creative-Agency").collection("reviews");
+  const adminCollection = client.db("Creative-Agency").collection("adminList");
   
 
   app.post('/addService', (req, res) => {
@@ -153,6 +154,21 @@ app.get('/getRviews', (req,res)=> {
   })
 })
 
+app.get('/all-order-list', (req,res)=> {
+  placeOrderCollection.find({})
+  .toArray((err, documents)=> {
+    res.status(200).send(documents)
+  })
+})
+
+
+app.post('/addAdmin', (req,res) => {
+  const email = req.body;
+  adminCollection.insertOne(email)
+  .then(result =>  {
+    res.send(result.insertedCount > 0 )
+  })
+})
 
 
 
