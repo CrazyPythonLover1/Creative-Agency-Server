@@ -27,6 +27,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   const serviceCollection = client.db("Creative-Agency").collection("services");
   const placeOrderCollection = client.db("Creative-Agency").collection("placeOrder");
+  const reviewCollection = client.db("Creative-Agency").collection("reviews");
   
 
   app.post('/addService', (req, res) => {
@@ -135,6 +136,15 @@ client.connect(err => {
   })
 
 });
+
+app.post('/addReview', (req, res)=> {
+  const review  = req.body;
+  reviewCollection.insertOne(review)
+  .then(result => {
+    res.send(result.insertedCount > 0 )
+  })
+
+})
 
 
 
