@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
 const fileUpload = require('express-fileupload');
+const { ObjectId } = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
@@ -118,23 +119,22 @@ client.connect(err => {
 
   app.post('/getUserOrderList', (req,res) => {
     const email = req.body.email;
-    console.log(email)
     placeOrderCollection.find({email: email})
     .toArray((err, docs)=>{
       res.status(200).send(docs);
     })
   })
 
-//   app.post('/getOrderedServiceList', (req,res) => {
-//     const selectedServiceName = req.body.selectedServiceName;
-
-//     serviceCollection.find({title: selectedServiceName})
-//       .toArray((err, docs)=>{
-//       res.status(200).send(docs);
+  app.post('/getOrderedServiceList', (req,res) => {
+    const serviceId = req.body.serviceId;
+    console.log(serviceId)
+    serviceCollection.find({_id: ObjectId(serviceId)})
+      .toArray((err, docs)=>{
+      res.status(200).send(docs);
     
-//   })
+  })
 
-// });
+});
 
 
 
