@@ -85,8 +85,6 @@ client.connect(err => {
     const description = req.body.description;
     const price = req.body.price;
     const serviceId = req.body.serviceId;
-   
-
 
     const newImg = file.data;
     const encImg = newImg.toString('base64');
@@ -158,6 +156,14 @@ client.connect(err => {
       .then(result => {
         res.send(result.insertedCount > 0)
       })
+  })
+
+  app.get('/getAdmin', (req,res)=> {
+    const email = req.query.email;
+    adminCollection.find({email: email})
+    .toArray((err, documents)=> {
+      res.status(200).send(documents)
+    })
   })
 
 
