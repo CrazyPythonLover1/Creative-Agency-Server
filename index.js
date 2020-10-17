@@ -35,57 +35,22 @@ client.connect(err => {
     const file = req.files.file;
     const title = req.body.title;
     const description = req.body.description;
-    const filePath = `${__dirname}/services/${file.name}`;
 
-    file.mv(filePath, err => {
-      if (err) {
-        res.status(500).send({ message: "Failed to upload image" });
-      }
+    // const filePath = `${__dirname}/services/${file.name}`;
 
-      const newImg = fs.readFileSync(filePath);
-      const encImg = newImg.toString('base64');
+    // file.mv(filePath, err => {
+    //   if (err) {
+    //     res.status(500).send({ message: "Failed to upload image" });
+    //   }
 
-      var image = {
-        contentType: req.files.file.mimeType,
-        size: req.files.file.size,
-        img: Buffer(encImg, 'base64')
-      }
+    // const newImg = fs.readFileSync(filePath);
+    // const encImg = newImg.toString('base64');
 
-      serviceCollection.insertOne({ title, description, image })
-        .then(result => {
-          fs.remove(filePath, error => {
-            if (error) {
-              console.log(error);
-              res.status(500).send({ message: "Failed to upload Image " });
-            }
-            res.send(result.insertedCount > 0)
-          })
-        })
-
-      return res.send({ name: file.name, path: `/${file.name}` })
-
-    })
-
-  })
-
-  app.get('/getServices', (req, res) => {
-    serviceCollection.find({})
-      .toArray((err, docs) => {
-        res.status(200).send(docs);
-      })
-  })
-
-
-
-  app.post('/placeOrder', (req, res) => {
-    const file = req.files.file;
-    const name = req.body.name;
-    const email = req.body.email;
-    const selectedServiceName = req.body.selectedServiceName;
-    const description = req.body.description;
-    const price = req.body.price;
-    const serviceId = req.body.serviceId;
-    const status = req.body.status;
+    // var image = {
+    //   contentType: req.files.file.mimeType,
+    //   size: req.files.file.size,
+    //   img: Buffer(encImg, 'base64')
+    // }
 
     const newImg = file.data;
     const encImg = newImg.toString('base64');
@@ -96,87 +61,127 @@ client.connect(err => {
       img: Buffer.from(encImg, 'base64')
     }
 
-    placeOrderCollection.insertOne({ name, email, selectedServiceName, description, price, image, serviceId, status })
+    serviceCollection.insertOne({ title, description, image })
       .then(result => {
-
-        res.send(result.insertedCount > 0)
+        
+          res.send(result.insertedCount > 0)
       })
 
     return res.send({ name: file.name, path: `/${file.name}` })
 
-
   })
 
+})
 
-  app.post('/getUserOrderList', (req, res) => {
-    const email = req.body.email;
-    placeOrderCollection.find({ email: email })
-      .toArray((err, docs) => {
-        res.status(200).send(docs);
-      })
-  })
-
-  app.post('/getOrderedServiceList', (req, res) => {
-    const serviceId = req.body.serviceId;
-    console.log(serviceId)
-    serviceCollection.find({ _id: ObjectId(serviceId) })
-      .toArray((err, docs) => {
-        res.status(200).send(docs);
-
-      })
-
-  });
-
-  app.post('/addReview', (req, res) => {
-    const review = req.body;
-    reviewCollection.insertOne(review)
-      .then(result => {
-        res.send(result.insertedCount > 0)
-      })
-
-  })
-
-  app.get('/getRviews', (req, res) => {
-    reviewCollection.find({}).limit(6)
-      .toArray((err, documents) => {
-        res.send(documents);
-      })
-  })
-
-  app.get('/all-order-list', (req, res) => {
-    placeOrderCollection.find({})
-      .toArray((err, documents) => {
-        res.status(200).send(documents)
-      })
-  })
+app.get('/getServices', (req, res) => {
+  serviceCollection.find({})
+    .toArray((err, docs) => {
+      res.status(200).send(docs);
+    })
+})
 
 
-  app.post('/addAdmin', (req, res) => {
-    const email = req.body;
-    adminCollection.insertOne(email)
-      .then(result => {
-        res.send(result.insertedCount > 0)
-      })
-  })
 
-  app.get('/getAdmin', (req,res)=> {
-    const email = req.query.email;
-    adminCollection.find({email: email})
-    .toArray((err, documents)=> {
+app.post('/placeOrder', (req, res) => {
+  const file = req.files.file;
+  const name = req.body.name;
+  const email = req.body.email;
+  const selectedServiceName = req.body.selectedServiceName;
+  const description = req.body.description;
+  const price = req.body.price;
+  const serviceId = req.body.serviceId;
+  const status = req.body.status;
+
+  const newImg = file.data;
+  const encImg = newImg.toString('base64');
+
+  var image = {
+    contentType: file.mimeType,
+    size: file.size,
+    img: Buffer.from(encImg, 'base64')
+  }
+
+  placeOrderCollection.insertOne({ name, email, selectedServiceName, description, price, image, serviceId, status })
+    .then(result => {
+
+      res.send(result.insertedCount > 0)
+    })
+
+  return res.send({ name: file.name, path: `/${file.name}` })
+
+
+})
+
+
+app.post('/getUserOrderList', (req, res) => {
+  const email = req.body.email;
+  placeOrderCollection.find({ email: email })
+    .toArray((err, docs) => {
+      res.status(200).send(docs);
+    })
+})
+
+app.post('/getOrderedServiceList', (req, res) => {
+  const serviceId = req.body.serviceId;
+  console.log(serviceId)
+  serviceCollection.find({ _id: ObjectId(serviceId) })
+    .toArray((err, docs) => {
+      res.status(200).send(docs);
+
+    })
+
+});
+
+app.post('/addReview', (req, res) => {
+  const review = req.body;
+  reviewCollection.insertOne(review)
+    .then(result => {
+      res.send(result.insertedCount > 0)
+    })
+
+})
+
+app.get('/getRviews', (req, res) => {
+  reviewCollection.find({}).limit(6)
+    .toArray((err, documents) => {
+      res.send(documents);
+    })
+})
+
+app.get('/all-order-list', (req, res) => {
+  placeOrderCollection.find({})
+    .toArray((err, documents) => {
       res.status(200).send(documents)
     })
-  })
+})
 
-  app.patch('/update-status', (req,res) => {
-    placeOrderCollection.updateOne(
-      {_id:ObjectId(req.body.id)},
-      { $set: {'status':req.body.status}}
-    )
+
+app.post('/addAdmin', (req, res) => {
+  const email = req.body;
+  adminCollection.insertOne(email)
     .then(result => {
-      res.send(result.modifiedCount> 0)
+      res.send(result.insertedCount > 0)
+    })
+})
+
+app.get('/getAdmin', (req, res) => {
+  const email = req.query.email;
+  adminCollection.find({ email: email })
+    .toArray((err, documents) => {
+      res.status(200).send(documents)
+    })
+})
+
+app.patch('/update-status', (req, res) => {
+  placeOrderCollection.updateOne(
+    { _id: ObjectId(req.body.id) },
+    { $set: { 'status': req.body.status } }
+  )
+    .then(result => {
+      res.send(result.modifiedCount > 0)
     })
     .catch(err => console.log(err))
-  })
+})
 
 
 
