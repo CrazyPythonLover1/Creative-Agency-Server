@@ -36,22 +36,7 @@ client.connect(err => {
     const title = req.body.title;
     const description = req.body.description;
 
-    // const filePath = `${__dirname}/services/${file.name}`;
-
-    // file.mv(filePath, err => {
-    //   if (err) {
-    //     res.status(500).send({ message: "Failed to upload image" });
-    //   }
-
-    // const newImg = fs.readFileSync(filePath);
-    // const encImg = newImg.toString('base64');
-
-    // var image = {
-    //   contentType: req.files.file.mimeType,
-    //   size: req.files.file.size,
-    //   img: Buffer(encImg, 'base64')
-    // }
-
+    
     const newImg = file.data;
     const encImg = newImg.toString('base64');
 
@@ -71,7 +56,7 @@ client.connect(err => {
 
   })
 
-})
+
 
 app.get('/getServices', (req, res) => {
   serviceCollection.find({})
